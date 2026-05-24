@@ -166,6 +166,7 @@ function App() {
             <table>
               <thead>
                 <tr>
+                  <th>CreatedDate</th>
                   <th>Task Name</th>
                   <th>Description</th>
                   <th>Status</th>
@@ -176,6 +177,7 @@ function App() {
                 {/* This is where the tasks will be rendered */}
                 {tasks.map((task) => (
                   <tr key={task.id}>
+                    <td>{task.createdDate}</td>
                     <td>{task.name}</td>
                     <td>{task.descriptions}</td>
                     <td>{task.status}</td>
