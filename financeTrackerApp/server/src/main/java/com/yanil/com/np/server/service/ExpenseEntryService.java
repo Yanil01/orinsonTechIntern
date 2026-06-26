@@ -23,6 +23,7 @@ public class ExpenseEntryService {
         this.userService = userService;
     }
 
+
     public List<Expense> getAllExpenses(){
         return expenseEntryRepository.findAll();
     }
@@ -31,19 +32,23 @@ public class ExpenseEntryService {
         expenseEntryRepository.save(expense);
     }
 
-    @Transactional
-    public void saveExpense(Expense expense, String username) throws IllegalAccessException {
+
+    public void saveExpense(Expense expense, String username) {
         User user = userService.getUserByUsername(username);
-        expense.setDate(LocalDate.now());
-        if(expense.getAmount().compareTo(user.getRemainingAmount())>0){
-            throw new IllegalAccessException("Insufficient remaining amount");
+        if (user == null) {
+            throw new IllegalArgumentException("User not found");
         }
-        Expense save = expenseEntryRepository.save(expense);
-        user.getExpenses().add(save);
-        user.setRemainingAmount(user.getRemainingAmount().subtract(expense.getAmount()));
+        if (expense.getAmount().compareTo(user.getRemainingAmount()) > 0) {
+            throw new IllegalArgumentException("Insufficient remaining amount");
+        }
+        expense.setDate(LocalDate.now());
+        Expense saved = expenseEntryRepository.save(expense);
+        user.getExpenses().add(saved);
+        user.setRemainingAmount(
+                user.getRemainingAmount().subtract(expense.getAmount())
+        );
         userService.saveUser(user);
     }
-
     public Expense getExpenseById(ObjectId id){
         return expenseEntryRepository.findById(id).orElse(null);
     }

@@ -25,15 +25,18 @@ public class ExpenseEntryController {
         this.userService = userService;
     }
 
-
     @PostMapping("/user/{username}")
-    public ResponseEntity<?> saveExpenseByUser(@PathVariable String username, @RequestBody Expense expense){
-        try{
+    public ResponseEntity<?> saveExpenseByUser(
+            @PathVariable String username,
+            @RequestBody Expense expense) {
+        try {
             expenseEntryService.saveExpense(expense, username);
             return new ResponseEntity<>(expense, HttpStatus.CREATED);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
         }
+        catch (Exception e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+
     }
 
     @GetMapping("/user/{username}")
