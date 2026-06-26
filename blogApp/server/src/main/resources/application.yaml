@@ -4,6 +4,9 @@ spring:
 
   data:
     mongodb:
-      host: localhost
-      port: 27017
-      database: blogDB
+      auto-index-creation: true
+
+  mongodb:
+    host: localhost
+    port: 27017
+    database: blogDB

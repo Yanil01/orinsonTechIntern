@@ -29,8 +29,15 @@ public class User {
     @NonNull
     private String password;
     private BigDecimal salary;
-    private BigDecimal remainingAmount = salary;
+    private BigDecimal remainingAmount;
     @DBRef
     private List<Expense> expenses = new ArrayList<>();
+
+    public void setSalary(BigDecimal salary){
+        this.salary = salary;
+        if (this.remainingAmount == null){
+            this.setRemainingAmount(salary);
+        }
+    }
 
 }
