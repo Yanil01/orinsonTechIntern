@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: server
+
+  data:
+    mongodb:
+      auto-index-creation: true
+
+  mongodb:
+    host: localhost
+    port: 27017
+    database: financeTrackerDB
+
+
