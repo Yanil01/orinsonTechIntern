@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -63,27 +64,24 @@ public class ExpenseEntryController {
 
     @DeleteMapping("/{username}/{id}")
     public ResponseEntity<?> deleteExpense(@PathVariable String username,@PathVariable ObjectId id) {
-        Expense expense = expenseEntryService.getExpenseById(id);
-        if (expense == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        try{
+            expenseEntryService.deleteExpenseById(username,id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch(Exception e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
-        expenseEntryService.deleteExpenseById(username,id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
     }
 
-    @PutMapping("id/{id}")
-    public ResponseEntity<Expense> updateExpense(@PathVariable ObjectId id, @RequestBody Expense newExpense) {
-        Expense oldExpense = expenseEntryService.getExpenseById(id);
-
-        if (oldExpense == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    @PutMapping("{username}/{id}")
+    public ResponseEntity<?> updateExpense(@PathVariable String username,@PathVariable ObjectId id, @RequestBody Expense newExpense) {
+        try{
+            Expense updateExpense = expenseEntryService.updateExpenseById(username,id,newExpense);
+            return new ResponseEntity<>(updateExpense, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
 
-        oldExpense.setTitle(newExpense.getTitle() != null && !newExpense.getTitle().isEmpty() ? newExpense.getTitle() : oldExpense.getTitle());
-        oldExpense.setAmount(newExpense.getAmount() != null ? newExpense.getAmount() : oldExpense.getAmount());
-        oldExpense.setCategory(newExpense.getCategory() != null && !newExpense.getCategory().isEmpty() ? newExpense.getCategory() : oldExpense.getCategory());
-        oldExpense.setDate(LocalDate.now());
-        expenseEntryService.saveNewExpense(oldExpense);
-        return new ResponseEntity<>(oldExpense, HttpStatus.OK);
+
     }
 }
