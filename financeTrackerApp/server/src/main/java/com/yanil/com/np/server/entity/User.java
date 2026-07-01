@@ -28,15 +28,16 @@ public class User {
     private String username;
     @NonNull
     private String password;
-    private BigDecimal salary;
+    private BigDecimal income;
     private BigDecimal remainingAmount;
     @DBRef
     private List<Expense> expenses = new ArrayList<>();
+    private List<String> roles;
 
-    public void setSalary(BigDecimal salary){
-        this.salary = salary;
+    public void setIncome(BigDecimal income){
+        this.income = income;
         if (this.remainingAmount == null){
-            this.setRemainingAmount(salary);
+            this.setRemainingAmount(income);
         }
     }
 

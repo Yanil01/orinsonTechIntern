@@ -3,6 +3,7 @@ package com.yanil.com.np.server.service;
 import com.yanil.com.np.server.entity.User;
 import com.yanil.com.np.server.repository.UserRepository;
 import org.bson.types.ObjectId;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,10 +12,18 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository userRepository;
-    public UserService(UserRepository userRepository) {
+    private final PasswordEncoder passwordEncoder;
+
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
+    public void saveNewUser(User user){
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setRoles(List.of("USER"));
+        userRepository.save(user);
+    }
     public void saveUser(User user){
         userRepository.save(user);
     }

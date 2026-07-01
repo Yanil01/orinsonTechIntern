@@ -2,12 +2,12 @@ package com.yanil.com.np.server.controller;
 
 
 import com.yanil.com.np.server.entity.Expense;
-import com.yanil.com.np.server.entity.User;
 import com.yanil.com.np.server.service.ExpenseEntryService;
-import com.yanil.com.np.server.service.UserService;
 import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -18,19 +18,17 @@ import java.util.List;
 public class ExpenseEntryController {
 
     private final ExpenseEntryService expenseEntryService;
-    private final UserService userService;
 
-    public ExpenseEntryController(ExpenseEntryService expenseEntryService, UserService userService) {
+    public ExpenseEntryController(ExpenseEntryService expenseEntryService) {
         this.expenseEntryService = expenseEntryService;
-        this.userService = userService;
     }
 
-    @PostMapping("/user/{username}")
+    @PostMapping("/user")
     public ResponseEntity<?> saveExpenseByUser(
-            @PathVariable String username,
+            @AuthenticationPrincipal User user,
             @RequestBody Expense expense) {
         try {
-            expenseEntryService.saveExpense(expense, username);
+            expenseEntryService.saveExpense(expense, user.getUsername());
             return new ResponseEntity<>(expense, HttpStatus.CREATED);
         }
         catch (Exception e){
@@ -39,13 +37,10 @@ public class ExpenseEntryController {
 
     }
 
-    @GetMapping("/user/{username}")
-    public ResponseEntity<List<Expense>> getAllExpenses(@PathVariable String username) {
-        User user = userService.getUserByUsername(username);
-        if (user == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        List<Expense> expenses = user.getExpenses();
+    @GetMapping("/user")
+    public ResponseEntity<List<Expense>> getAllExpenses(@AuthenticationPrincipal User user) {
+
+        List<Expense> expenses = expenseEntryService.getExpensesByUsername(user.getUsername());
         if (expenses == null || expenses.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
@@ -61,10 +56,10 @@ public class ExpenseEntryController {
         return new ResponseEntity<>(expense, HttpStatus.OK);
     }
 
-    @DeleteMapping("/{username}/{id}")
-    public ResponseEntity<?> deleteExpense(@PathVariable String username,@PathVariable ObjectId id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteExpenseById(@PathVariable ObjectId id, @AuthenticationPrincipal User user) {
         try{
-            expenseEntryService.deleteExpenseById(username,id);
+            expenseEntryService.deleteExpenseById(user.getUsername(), id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch(Exception e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -72,10 +67,10 @@ public class ExpenseEntryController {
 
     }
 
-    @PutMapping("{username}/{id}")
-    public ResponseEntity<?> updateExpense(@PathVariable String username,@PathVariable ObjectId id, @RequestBody Expense newExpense) {
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateExpense(@AuthenticationPrincipal User user,@PathVariable ObjectId id, @RequestBody Expense newExpense) {
         try{
-            Expense updateExpense = expenseEntryService.updateExpenseById(username,id,newExpense);
+            Expense updateExpense = expenseEntryService.updateExpenseById(user.getUsername(),id,newExpense);
             return new ResponseEntity<>(updateExpense, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);

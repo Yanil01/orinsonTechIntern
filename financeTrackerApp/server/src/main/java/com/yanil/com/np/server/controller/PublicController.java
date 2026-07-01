@@ -26,8 +26,7 @@ public class PublicController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody User user){
-        user.setSalary(user.getSalary());
-        userService.saveUser(user);
+        userService.saveNewUser(user);
         return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
 }

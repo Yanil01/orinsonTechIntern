@@ -29,6 +29,11 @@ public class ExpenseEntryService {
         return expenseEntryRepository.findAll();
     }
 
+    public List<Expense> getExpensesByUsername(String username){
+        User user = userService.getUserByUsername(username);
+        return user.getExpenses();
+    }
+
     public void saveNewExpense(Expense expense){
         expenseEntryRepository.save(expense);
     }
