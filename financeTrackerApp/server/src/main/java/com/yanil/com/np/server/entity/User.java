@@ -34,11 +34,5 @@ public class User {
     private List<Expense> expenses = new ArrayList<>();
     private List<String> roles;
 
-    public void setIncome(BigDecimal income){
-        this.income = income;
-        if (this.remainingAmount == null){
-            this.setRemainingAmount(income);
-        }
-    }
 
 }

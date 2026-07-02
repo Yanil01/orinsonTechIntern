@@ -2,7 +2,8 @@ package com.yanil.com.np.server.service;
 
 import com.yanil.com.np.server.entity.User;
 import com.yanil.com.np.server.repository.UserRepository;
-import lombok.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -17,10 +18,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(@NonNull String username) throws UsernameNotFoundException {
+    @NullMarked
+    public UserDetails loadUserByUsername( String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username);
         if (user != null) {
-            return org.springframework.security.core.userdetails.User.builder().username(user.getUsername()).password(user.getPassword()).roles(user.getRoles().toArray(new String[0])).build();
+            return org.springframework.security.core.userdetails.User.builder().username(user.getUsername()).password(user.getPassword()).authorities(user.getRoles().stream().map(SimpleGrantedAuthority::new).toList()).build();
         }
         throw new UsernameNotFoundException("User not found with username: " + username);
     }

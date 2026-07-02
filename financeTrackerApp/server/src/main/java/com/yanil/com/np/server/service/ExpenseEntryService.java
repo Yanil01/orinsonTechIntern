@@ -41,8 +41,12 @@ public class ExpenseEntryService {
 
     public void saveExpense(Expense expense, String username) {
         User user = userService.getUserByUsername(username);
+
         if (user == null) {
             throw new IllegalArgumentException("User not found");
+        }
+        if (user.getRemainingAmount() == null) {
+            throw new IllegalStateException("User income is not initialized");
         }
         if (expense.getAmount().compareTo(user.getRemainingAmount()) > 0) {
             throw new IllegalArgumentException("Insufficient remaining amount");

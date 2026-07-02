@@ -7,7 +7,7 @@ import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -25,10 +25,10 @@ public class ExpenseEntryController {
 
     @PostMapping("/user")
     public ResponseEntity<?> saveExpenseByUser(
-            @AuthenticationPrincipal User user,
+            @AuthenticationPrincipal UserDetails userDetails,
             @RequestBody Expense expense) {
         try {
-            expenseEntryService.saveExpense(expense, user.getUsername());
+            expenseEntryService.saveExpense(expense, userDetails.getUsername());
             return new ResponseEntity<>(expense, HttpStatus.CREATED);
         }
         catch (Exception e){
@@ -38,9 +38,9 @@ public class ExpenseEntryController {
     }
 
     @GetMapping("/user")
-    public ResponseEntity<List<Expense>> getAllExpenses(@AuthenticationPrincipal User user) {
+    public ResponseEntity<List<Expense>> getAllExpenses(@AuthenticationPrincipal UserDetails userDetails) {
 
-        List<Expense> expenses = expenseEntryService.getExpensesByUsername(user.getUsername());
+        List<Expense> expenses = expenseEntryService.getExpensesByUsername(userDetails.getUsername());
         if (expenses == null || expenses.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
@@ -57,9 +57,9 @@ public class ExpenseEntryController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteExpenseById(@PathVariable ObjectId id, @AuthenticationPrincipal User user) {
+    public ResponseEntity<?> deleteExpenseById(@PathVariable ObjectId id, @AuthenticationPrincipal UserDetails userDetails) {
         try{
-            expenseEntryService.deleteExpenseById(user.getUsername(), id);
+            expenseEntryService.deleteExpenseById(userDetails.getUsername(), id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch(Exception e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -68,9 +68,9 @@ public class ExpenseEntryController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateExpense(@AuthenticationPrincipal User user,@PathVariable ObjectId id, @RequestBody Expense newExpense) {
+    public ResponseEntity<?> updateExpense(@AuthenticationPrincipal UserDetails userDetails,@PathVariable ObjectId id, @RequestBody Expense newExpense) {
         try{
-            Expense updateExpense = expenseEntryService.updateExpenseById(user.getUsername(),id,newExpense);
+            Expense updateExpense = expenseEntryService.updateExpenseById(userDetails.getUsername(),id,newExpense);
             return new ResponseEntity<>(updateExpense, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
