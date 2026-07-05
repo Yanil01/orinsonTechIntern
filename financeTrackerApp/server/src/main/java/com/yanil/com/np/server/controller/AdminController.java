@@ -5,9 +5,8 @@ import com.yanil.com.np.server.entity.Expense;
 import com.yanil.com.np.server.entity.User;
 import com.yanil.com.np.server.service.ExpenseEntryService;
 import com.yanil.com.np.server.service.UserService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.bson.types.ObjectId;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -30,6 +29,10 @@ public class AdminController {
         return expenseEntryService.getAllExpenses();
     }
 
+    @DeleteMapping("/users/{id}")
+    public void deleteUserByUsername(@PathVariable ObjectId id){
+        userService.deleteUserById(id);
+    }
 
 
 }
