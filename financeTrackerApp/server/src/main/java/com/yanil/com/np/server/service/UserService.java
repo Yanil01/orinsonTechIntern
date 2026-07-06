@@ -1,5 +1,6 @@
 package com.yanil.com.np.server.service;
 
+
 import com.yanil.com.np.server.entity.User;
 import com.yanil.com.np.server.repository.UserRepository;
 import org.bson.types.ObjectId;
@@ -39,6 +40,7 @@ public class UserService {
     public User getUserByUsername(String username){
         return userRepository.findByUsername(username);
     }
+
 
     public void deleteUserById(ObjectId id){
        userRepository.deleteById(id);

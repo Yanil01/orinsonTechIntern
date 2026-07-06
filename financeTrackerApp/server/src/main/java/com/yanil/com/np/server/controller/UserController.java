@@ -3,7 +3,7 @@ package com.yanil.com.np.server.controller;
 import com.yanil.com.np.server.entity.User;
 import com.yanil.com.np.server.service.UserService;
 import lombok.Data;
-import org.bson.types.ObjectId;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -16,13 +16,22 @@ import java.math.BigDecimal;
 @RequestMapping("/users")
 public class UserController {
    private final UserService userService;
-    public UserController(UserService userService) {
+   private final PasswordEncoder passwordEncoder;
+    public UserController(UserService userService, PasswordEncoder passwordEncoder) {
         this.userService = userService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Data
     public static class IncomeRequest {
         private BigDecimal income;
+    }
+
+    @Data
+    public static class ChangePasswordRequest {
+        private String currentPassword;
+        private String newPassword;
+
     }
 
 
@@ -63,6 +72,23 @@ public class UserController {
         userService.saveUser(user);
 
         return new ResponseEntity<>(user.getIncome(), HttpStatus.CREATED);
+    }
+
+    @PutMapping("/change-password")
+    public ResponseEntity<?> changePassword(@AuthenticationPrincipal UserDetails userDetails, @RequestBody ChangePasswordRequest request){
+        try{
+            User user = userService.getUserByUsername(userDetails.getUsername());
+            if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+                throw new IllegalArgumentException("Current password is incorrect.");
+            }
+
+            user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+            userService.saveUser(user);
+            return new ResponseEntity<>("Password changed successfully.", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+
     }
 
     @DeleteMapping
