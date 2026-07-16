@@ -20,10 +20,11 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public void saveNewUser(User user){
+    public User saveNewUser(User user){
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRoles(List.of("USER"));
         userRepository.save(user);
+        return user;
     }
     public void saveUser(User user){
         userRepository.save(user);
